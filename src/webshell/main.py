@@ -16,8 +16,6 @@ try:
     channel = client.invoke_shell()
     time.sleep(0.5)
 
-    # stdin, stdout, stderr = client.exec_command(command)
-
     commands = [
         'ls',
         'whoami',
@@ -25,7 +23,7 @@ try:
     ]
 
     for command in commands:
-        channel.send(command + '\n')
+        channel.send(bytes(command + '\n', 'utf-8'))
         time.sleep(0.05)
 
     output = ''
