@@ -6,7 +6,8 @@ from .consumers import Consumer
 application = ProtocolTypeRouter({
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            path("ws/shell", Consumer)
+            path("ws/stream", Consumer.as_asgi())
         ])
     )
 })
+

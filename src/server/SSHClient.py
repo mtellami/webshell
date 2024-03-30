@@ -7,6 +7,9 @@ class SSHClient:
         self.client.connect('localhost', 22, username, password)
         self.channel = self.client.invoke_shell()
 
+    def get_client(self):
+        return self.client
+
     def get_channel(self):
         return self.channel
 
