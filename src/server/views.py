@@ -1,5 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-def root(request):
-    return HttpResponse('PONG')
+def login(request):
+    return HttpResponse(bytes('LOGIN', 'utf-8'))

@@ -1,6 +1,6 @@
 from django.urls import path
-from server.views import root
+from server.views import login
 
 urlpatterns = [
-    path('', root, name='root')
+    path('ws/login/', login, name='login')
 ]
