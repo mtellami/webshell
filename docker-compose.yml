@@ -1,9 +1,39 @@
-version: '3'
+version: '3.8'
 
 services:
-  webshell:
-    container_name: webshell
-    build: .
+  api:
+    container_name: api
+    image: ws:api
+    build: 
+      context: api
     ports:
-      - 4000:4000
+      - "8000:8000"
+    networks:
+      - webshell
+    volumes:
+      - ./api:/home/node/app
+    env_file:
+      - .env
     restart: always
+
+  ui:
+    container_name: ui
+    image: ws:ui
+    build: 
+      context: ui
+    ports:
+      - "4000:4000"
+    networks:
+      - webshell
+    volumes:
+      - ./ui:/home/python/app
+    env_file:
+      - .env
+    depends_on:
+      - api
+    restart: always
+
+networks:
+  webshell:
+    name: webshell
+    driver: bridge
