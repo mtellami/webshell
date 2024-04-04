@@ -9,11 +9,15 @@ from os import getenv
 class SSH:
     def __init__(self, username, password):
         if not username or not password:
-            raise Exception('Authentication failed')
-        self.client = SSHClient()
-        self.client.set_missing_host_key_policy(AutoAddPolicy())
-        self.client.connect('localhost', 22, username, password)
-        self.channel = self.client.invoke_shell()
+            raise Exception('Authentication failed: No session credentials')
+        try:
+            self.client = SSHClient()
+            self.client.set_missing_host_key_policy(AutoAddPolicy())
+            self.client.connect('localhost', 22, username, password)
+            self.channel = self.client.invoke_shell()
+            sleep(0.05)
+        except:
+            raise Exception('Failed to connect to ssh server')
 
     def get_client(self):
         return self.client
@@ -32,8 +36,10 @@ class Consumer(WebsocketConsumer):
             load_dotenv()
             self.ssh = SSH(getenv('SSH_USER'), getenv('SSH_PASSWORD'))
             self.accept()
-        except Exception:
-            print('WebSocket client authentication failed')
+            sleep(0.5)
+            self.send(self.channel())
+        except Exception as error:
+            print('WebSocket client authentication failed:', error, flush=True)
 
     def disconnect(self, close_code):
         if hasattr(self, 'ssh'):
@@ -41,7 +47,7 @@ class Consumer(WebsocketConsumer):
 
     def receive(self, text_data=None, bytes_data=None):
         try:
-            if not text_data:
+            if text_data == None:
                 raise Exception('No data sent')
             data = loads(text_data)
             event = data.get('event')
@@ -50,7 +56,8 @@ class Consumer(WebsocketConsumer):
             if event == 'shellstream':
                 command = data.get('command')
                 self.stream(command)
-        except Exception:
+        except Exception as error:
+            print(error)
             self.error('invalid payload')
 
     def stream(self, command):
@@ -58,12 +65,7 @@ class Consumer(WebsocketConsumer):
             channel = self.ssh.get_channel()
             channel.send(command + '\n')
             sleep(0.1)
-            output = ''
-            while channel.recv_ready():
-                output += channel.recv(1024).decode()
-            if channel.closed:
-                raise Exception('channel closed')
-            self.send(output)
+            self.send(self.channel())
         except Exception:
             self.send('shell stream closed')
             self.close()
@@ -71,3 +73,10 @@ class Consumer(WebsocketConsumer):
     def error(self, message):
         payload = dumps({'error': message})
         self.send(text_data=payload)
+
+    def channel(self):
+        channel = self.ssh.get_channel()
+        output = ''
+        while channel.recv_ready():
+            output += channel.recv(1024).decode()
+        return output
