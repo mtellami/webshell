@@ -15,7 +15,6 @@ class SSH:
             self.client.set_missing_host_key_policy(AutoAddPolicy())
             self.client.connect('localhost', 22, username, password)
             self.channel = self.client.invoke_shell()
-            sleep(0.05)
         except:
             raise Exception('Failed to connect to ssh server')
 

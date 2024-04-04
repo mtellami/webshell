@@ -3,7 +3,9 @@
 <!-- open pipe -->
 browser <==> socket-server <==> ssh-client
 
-#### run
+#### run dev
 ```zsh
-    docker-compose up --build
+    pip install pipenv
+    pipenv sync
+    pipenv run python manage.py runserver
 ```

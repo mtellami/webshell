@@ -15,7 +15,6 @@ const Terminal = () => {
 
 			socket.onopen = () => {
 				console.log('websocket connected')
-				// socket.send(JSON.stringify({ event: "shellstream", command: input }))
 				socket.onmessage = (event) => {
 					terminal.write(event.data)
 					input = ''
@@ -26,14 +25,16 @@ const Terminal = () => {
 			}
 
 			terminal.onKey((event) => {
-				if (event.key.charCodeAt(0) >= 32 && event.key.charCodeAt(0) <= 126) {
+				if (event.key == '\r') {
+					socket.send(JSON.stringify({ event: "shellstream", command: input }))
+				} else if (event.key.charCodeAt(0) == 127) {
+					if (input !== '') {
+						terminal.write('\b \b')
+						input = input.slice(0, input.length - 1)
+					}
+				} else {
 					input += event.key
 					terminal.write(event.key)
-				} else if (event.key == '\r') {
-					socket.send(JSON.stringify({ event: "shellstream", command: input }))
-				} else if (event.key.charCodeAt(0) == 127 && input !== '') {
-					terminal.write('\b \b')
-					input = input.slice(0, input.length - 1)
 				}
 			})
 
