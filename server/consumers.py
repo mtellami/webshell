@@ -71,6 +71,8 @@ class Consumer(WebsocketConsumer):
             channel.send(command)
             sleep(0.1)
             self.send(self.channel())
+            if channel.closed:
+                self.close()
         except Exception:
             self.send('shell stream closed')
             self.close()

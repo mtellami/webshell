@@ -10,9 +10,7 @@ const Terminal = () => {
 	let socket = null;
 
   useEffect(() => {
-		const terminal = new XTerm({
-			cols: 80
-		})
+		const terminal = new XTerm()
 		const token = Cookies.get('session_token')
 		if (!token) {
 			navigate('/login')
@@ -26,6 +24,11 @@ const Terminal = () => {
 				console.log('websocket connected')
 				socket.onmessage = (event) => {
 					terminal.write(event.data)
+				}
+				socket.onclose = () => {
+					console.log('Websocket disconnected')
+					Cookies.remove('session_token')
+					navigate('/login')
 				}
 			}
 			socket.onerror = (error) => {
