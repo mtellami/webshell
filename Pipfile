@@ -9,6 +9,8 @@ python-dotenv = "*"
 django = "*"
 channels = "*"
 daphne = "*"
+django-cors-headers = "*"
+pyjwt = "*"
 
 [dev-packages]
 

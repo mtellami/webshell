@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from json import loads, dumps
 from time import sleep
 from os import getenv
+from jwt import decode
 
 
 class SSH:
@@ -30,10 +31,15 @@ class SSH:
 
 class Consumer(WebsocketConsumer):
     def connect(self):
+        load_dotenv()
         try:
-            # connect using username & passoword from the JWT token sent
-            load_dotenv()
-            self.ssh = SSH(getenv('SSH_USER'), getenv('SSH_PASSWORD'))
+            token = self.scope['query_string'].decode().split('=')[1]
+            if not token:
+                raise Exception('No access token provided')
+            payload = decode(token, getenv('JWT_SECRET_KEY'), algorithms=['HS256'])
+            username = payload['username']
+            password = payload['password']
+            self.ssh = SSH(username, password)
             self.accept()
             sleep(0.5)
             self.send(self.channel())
@@ -62,7 +68,7 @@ class Consumer(WebsocketConsumer):
     def stream(self, command):
         try:
             channel = self.ssh.get_channel()
-            channel.send(command + '\n')
+            channel.send(command)
             sleep(0.1)
             self.send(self.channel())
         except Exception:
