@@ -1,4 +1,4 @@
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseNotAllowed
 from json import loads
 from .consumers import SSH
 from os import getenv
@@ -6,7 +6,7 @@ from jwt import encode
 
 def login(request):
     if request.method != 'POST':
-        return HttpResponseBadRequest(f'Can\'t {request.method} /ws/login')
+        return HttpResponseNotAllowed(f'Can\'t {request.method} /ws/api/login')
 
     try:
         body = loads(request.body)
@@ -19,4 +19,4 @@ def login(request):
         token = encode(body, getenv('JWT_SECRET_KEY'), algorithm='HS256')
         return JsonResponse({'session_token': token})
     except:
-        return JsonResponse({'error': 'invalid session credentials'})
+        return JsonResponse({'error': 'invalid session credentials'}, status=401)

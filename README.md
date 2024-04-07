@@ -1,15 +1,30 @@
 ### Remote Control
 
+- Controll your machine from the browser.
+
 <!-- open pipe -->
 browser <==> socket-server <==> ssh-client
 
-#### run dev
+
+#### 1 - Run app ui
+
 ```zsh
-    pip install pipenv
+    docker-compose up --build -d
 ```
+#### 2 - Django server
+
+##### - using pipenv
 ```zsh
     pipenv sync
-```
-```zsh
     pipenv run python manage.py runserver
+```
+##### - Or pip
+```zsh
+    pip install -r requirements.txt
+    python manage.py runserver
+```
+
+#### 3 - URL
+```zsh
+   http://localhost:4000 
 ```

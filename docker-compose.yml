@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: webshell
+    image: webshell:image
+    build: ui
+    networks:
+      - webshell
+    ports:
+      - 4000:4000
+    env_file:
+      - .env
+    restart: always
+
+networks:
+  webshell:
+    name: webshell
+    driver: bridge 
